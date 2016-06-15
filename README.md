@@ -8,40 +8,52 @@ This package is designed to be an easy way to use Afilnet API services. You can 
 You only need an Afilnet account with enought credits.
 If you do not have an account, you can [create it](http://afilnet.us/client/register.php) in a few minutes.
 
+Example
 ```js
 var afilnet = require('afilnet');
 
-afilnet.setUsername('your username');
-afilnet.setPassword('your password');
+if (afilnet.login("account@test.com", "password")){
+	console.log("You are logged in");
+} else {
+	console.log("Bad credentials");
+}
 
-//SEND SMS
-afilnet.sendSMS(
+//You must login correctly or all services will return error bad user/pass
+
+//SEND SIMPLE SMS
+afilnet.sms.send(
     'to',
     'message',
     'from',
+    'scheduledatetime', //Optional, you can set it null
+    'output',   //Optional, you can set it null
     function(result){
         console.log(result);
     }
 );
 
-//SEND EMAIL
-afilnet.sendEmail(
+//SEND EMAIL FROM TEMPLATE
+afilnet.email.sendFromTemplate(
     'to',
-    'message',
-    'subject',
+    'idTemplate',
+    'params',
+    'scheduledatetime', //Optional, you can set it as null
+    'output', //Optional, you can set it as null
     function(result){
         console.log(result);
     }
 );
 
-//SEND VOICE
-afilnet.sendVoice(
-    'to',
-    'message',
+//SEND VOICE TO GROUP
+afilnet.voice.sendToGroup(
+    'countryCode',
+    'idGroup',
+    'msg',
+    'scheduledatetime', //Optional, you can set it as null
+    'output', //Optional, you can set it as null
     function(result){
         console.log(result);
     },
-    'lang' //OPTIONAL PARAMETER
 );
 ```
 
@@ -102,11 +114,14 @@ The first step is require the module.
 var afilnet = require('afilnet');
 ```
 
-Then set your username and password.
+Then login with your account credentials. **(You must login correctly or all services will return error bad user/pass)**
 
 ```js
-afilnet.setUsername('your username');
-afilnet.setPassword('your password');
+if (afilnet.login("account@test.com", "password")){
+	console.log("You are logged in");
+} else {
+	console.log("Bad credentials");
+}
 ```
 
 And now we are ready to use the services :)
@@ -120,32 +135,82 @@ And now we are ready to use the services :)
 
 ## Afilnet API Services
 
-There are 3 services availables:
-- [Send SMS](#sms)
-- [Send Email](#email)
-- [Send Voice](#voice)
-  
+There are 4 channels availables:
+- [User](#user)
+- [SMS](#sms)
+- [Email](#email)
+- [Voice](#voice)
+
+This library use the structure: 
+
+```js
+afilnet.channel.service(params, callbackFunction);
+```
+
+User has two services:
+- getBalance (Get balance of your account)
+- getUsername (Get username of the logged account)
+
+SMS, Email and Voice have the same services:
+- send (Send to a single user)
+- sendFromTemplate (Send to a single user using a template)
+- sendToGroup (Send to a defined group)
+- sendToGroupFromTemplate (Send to a defined group using a template)
+- getDeliveryStatus (Get delivery status of a message)
+
 ---
 
 ### SMS
 
-If you want to send SMS you only need to call a function: sendSMS
+If you want to use SMS you only need to call the object sms and the service required.
 
-This function requires 4 parameters: to, message, from, callback.
-* to: 
-    *  String.
-    *  Mobile phone number where the message will be send.
-    *  Country prefix is required.
-* message:
-    *  String (max 160 characters or text will be split in multiple messages).
-    *  Text to be sent.
-* from:
-    *  String(max 11 characters).
-    *  Name of sender.
-* callback:
-    *  Function (1 parameter).
-    *  Function which will handle the JSON response.
+#### Services
+```js
+//SEND
+afilnet.sms.send(
+    'from',
+    'to', 
+    'msg',
+    'scheduledatetime', // (optional) 
+    'output', // (optional)
+    callback
+);
 
+//SEND FROM TEMPLATE
+afilnet.sms.sendFromTemplate(
+    'to', 
+    'idTemplate', 
+    'params', // (optional) 
+    'scheduledatetime', // (optional) 
+    'output', // (optional)
+    callback
+);
+
+//SEND TO GROUP
+afilnet.sms.sendToGroup(
+   'from', 
+   'countryCode', 
+   'idGroup', 
+   'msg', 
+   'scheduledatetime', // (optional) 
+    'output', // (optional)
+    callback
+);
+
+//SEND TO GROUP FROM TEMPLATE
+afilnet.sms.sendToGroupFromTemplate(
+    'countryCode', 
+    'idGroup', 
+    'idTemplate', 
+    'scheduledatetime', // (optional) 
+    'output', // (optional)
+    callback
+);
+
+// GET DELIVERY STATUS
+afilnet.sms.getDeliveryStatus('ids', callback);
+?>
+```
 
 #### Example
 
@@ -155,9 +220,11 @@ var message = "Hey Luke, I want to tell you something... I am your father.";
 var from = "Darth Vader";
 
 afilnet.sendSMS(
+    from,
     to,
     message,
-    from,
+    null,
+    null,
     function(result){
         if (result.status=="SUCCESS"){
             console.log("Nooooo!!!!!11");
@@ -176,34 +243,68 @@ afilnet.sendSMS(
 
 ### Email
 
-If you want to send email you only need to call a function: sendEmail
+If you want to use Email you only need to call the object sms and the service required.
 
-This function requires 4 parameters: to, message, subject, callback
-* to: 
-    *  String.
-    *  Email address where the message will be send.
-* message:
-    *  String (The string may have HTML entities).
-    *  Message to be sent.
-* subject:
-    *  String.
-    *  Subject of email.
-* callback:
-    *  Function (1 parameter).
-    *  Function which will handle the JSON response.
+#### Services
+
+```js
+//SEND
+afilnet.email.send(
+    'subject',
+    'to', 
+    'msg',
+    'scheduledatetime', // (optional) 
+    'output', // (optional)
+    callback
+);
+
+//SEND FROM TEMPLATE
+afilnet.email.sendFromTemplate(
+    'to', 
+    'idTemplate', 
+    'params', // (optional) 
+    'scheduledatetime', // (optional) 
+    'output', // (optional)
+    callback
+);
+
+//SEND TO GROUP
+afilnet.email.sendToGroup(
+    'subject', 
+    'idGroup', 
+    'msg', 
+    'scheduledatetime', // (optional) 
+    'output', // (optional)
+    callback
+);
+
+//SEND TO GROUP FROM TEMPLATE
+afilnet.email.sendToGroupFromTemplate(
+    'idGroup', 
+    'idTemplate', 
+    'scheduledatetime', // (optional) 
+    'output', // (optional)
+    callback
+);
+
+// GET DELIVERY STATUS
+afilnet.email.getDeliveryStatus('ids', callback);
+```
 
 
 #### Example
 
 ```js
 var to = "luke_skywalker@newjediorder.com";
-var message = "<h2>I am your father.</h2><hr><p>Hehehe surprise.</p><p>Best wishes, Darth Vader.</p>";
 var subject = "I have a surprise for you - Darth Vader";
+var message = "<h2>I am your father.</h2><hr><p>Hehehe surprise.</p><p>Best wishes, Darth Vader.</p>";
 
-afilnet.sendEmail(
-    to,
-    message,
+afilnet.email.send(
     subject,
+    to, 
+    message,
+    null, // (optional) 
+    null, // (optional)
     function(result){
         if (result.status=="SUCCESS"){
             console.log("Nooooo!!!!!11");
@@ -222,43 +323,75 @@ afilnet.sendEmail(
 
 ### Voice
 
-If you want to send voice you only need to call a function: sendVoice
+If you want to use Voice you only need to call the object sms and the service required.
 
-This function requires 4 parameters: to, message, callback, lang
-* to: 
-    *  String.
-    *  Mobile phone number where the message will be send.
-    *  Country prefix is required.
-* message:
-    *  String.
-    *  Text to be sent.
-* callback:
-    *  Function (1 parameter).
-    *  Function which will handle the JSON response.
-* lang:
-    *  *Optional parameter*
-    *  String.
-    *  [ISO code (2 digits)](https://en.wikipedia.org/wiki/ISO_3166-1#Officially_assigned_code_elements) of the language in which the message will be transformed to voice.
+#### Services
 
+```js
+//SEND
+afilnet.voice.send(
+    'to', 
+    'msg',
+    'lang', // (optional) 
+    'scheduledatetime', // (optional) 
+    'output', // (optional)
+    callback
+);
+
+//SEND FROM TEMPLATE
+afilnet.voice.sendFromTemplate(
+    'to', 
+    'idTemplate', 
+    'params', // (optional) 
+    'scheduledatetime', // (optional) 
+    'output', // (optional)
+    callback 
+);
+
+//SEND TO GROUP
+afilnet.voice.sendToGroup(
+   'countryCode', 
+   'idGroup', 
+   'msg', 
+   'scheduledatetime', // (optional) 
+   'output', // (optional) 
+    callback
+);
+
+//SEND TO GROUP FROM TEMPLATE
+afilnet.voice.sendToGroupFromTemplate(
+    'countryCode', 
+    'idGroup', 
+    'idTemplate', 
+    'scheduledatetime', // (optional) 
+    'output', // (optional) 
+    callback
+);
+
+// GET DELIVERY STATUS
+afilnet.voice.getDeliveryStatus('ids', callback);
+```
 
 #### Example
 
 ```js
 var to = "346000000";
-var message = "Hey Luke, I want to tell you something... I... am... your father.</p>";
+var message = "Hey Luke, I want to tell you something... I... am... your father.";
 var lang = "EN";
 
-afilnet.sendEmail(
+afilnet.voice.send(
     to,
     message,
+    null,
+    null,
+    lang,
     function(result){
         if (result.status=="SUCCESS"){
-            console.log("Wait, what?!... Nooooo!!!!!11");
+            console.log("Wait, what?!... Nooooo!!!!!");
         } else { // == "ERROR"
             console.log("I have not received any phone call :(");
         }
-    },
-    lang
+    }
 );
 ```
 
