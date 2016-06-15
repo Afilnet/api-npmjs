@@ -64,6 +64,7 @@ afilnet.voice.sendToGroup(
     *  [Our website](#website)
 * [Setup](#setup)
 * [API Services](#afilnet-api-service)
+    * [User](#user)
     * [SMS](#sms)
     * [Email](#email)
     * [Voice](#voice)
@@ -149,7 +150,7 @@ afilnet.channel.service(params, callbackFunction);
 
 User has two services:
 - getBalance (Get balance of your account)
-- getUsername (Get username of the logged account)
+- getUsername (Return username of the logged account) *This service return a variable, so it doesn't require callback function*
 
 SMS, Email and Voice have the same services:
 - send (Send to a single user)
@@ -159,6 +160,35 @@ SMS, Email and Voice have the same services:
 - getDeliveryStatus (Get delivery status of a message)
 
 ---
+
+### User
+
+If you want to check User parameters you only need to call the object user and the service required.
+
+#### Services
+```js
+//GET BALANCE
+afilnet.user.getBalance(callback);
+
+//GET USERNAME
+var accountUsername = afilnet.user.getUsername();
+```
+
+#### Example
+
+```js
+var accountUsername = afilnet.user.getUsername();
+
+afilnet.user.getBalance(
+    function(result){
+        if (result.status=="SUCCESS"){
+            console.log("I have " + result.result + " credits");
+        } else { // == "ERROR"
+            console.log("Error: "+ result.error);
+        }
+    }
+);
+```
 
 ### SMS
 
@@ -209,7 +239,6 @@ afilnet.sms.sendToGroupFromTemplate(
 
 // GET DELIVERY STATUS
 afilnet.sms.getDeliveryStatus('ids', callback);
-?>
 ```
 
 #### Example
@@ -219,7 +248,7 @@ var to = "34600000000";
 var message = "Hey Luke, I want to tell you something... I am your father.";
 var from = "Darth Vader";
 
-afilnet.sendSMS(
+afilnet.sms.send(
     from,
     to,
     message,
