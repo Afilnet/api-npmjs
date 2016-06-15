@@ -1,6 +1,6 @@
 {
   "name": "afilnet",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "An easy way to use Afilnet API services to send SMS, email and voice notifications.",
   "main": "index.js",
   "scripts": {
