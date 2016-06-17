@@ -1,6 +1,6 @@
 {
   "name": "afilnet",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "An easy way to use Afilnet API services to send SMS, email and voice notifications.",
   "main": "index.js",
   "scripts": {
@@ -20,9 +20,12 @@
     "service"
   ],
   "author": "Afilnet Cloud Marketing",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Afilnet/api-npmjs"
+  },
+  "license": "MIT",
   "dependencies": {
     "request": "^2.72.0"
-  },
-  "devDependencies": {}
+  }
 }
