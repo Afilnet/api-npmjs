@@ -12,11 +12,18 @@ Example
 ```js
 var afilnet = require('afilnet');
 
-if (afilnet.login("account@test.com", "password")){
-	console.log("You are logged in");
-} else {
-	console.log("Bad credentials");
-}
+afilnet.login(
+	"account@test.com", 
+	"password",
+	function(result){
+		if (result){
+			console.log("User logged");
+		}
+		else {
+			console.log("Bad credentials");
+		}
+	}
+);
 
 //You must login correctly or all services will return error bad user/pass
 
@@ -118,14 +125,21 @@ var afilnet = require('afilnet');
 Then login with your account credentials. **(You must login correctly or all services will return error bad user/pass)**
 
 ```js
-if (afilnet.login("account@test.com", "password")){
-	console.log("You are logged in");
-} else {
-	console.log("Bad credentials");
-}
+afilnet.login(
+	"account@test.com", 
+	"password",
+	function(result){
+		if (result){
+			console.log("User logged");
+		}
+		else {
+			console.log("Bad credentials");
+		}
+	}
+);
 ```
 
-And now we are ready to use the services :)
+If you have been successfully logged in, we are ready to use the services :)
 
 
 [back to top](#index)
